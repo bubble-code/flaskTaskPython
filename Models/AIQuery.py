@@ -21,6 +21,7 @@ class AIQuery:
         self.context.append( {'role':'system', 'content':"""third table:{"tablename": "studies","fields": [{"name": "ID","type": "int"},{"name": "ID_usr","type": "int"},{"name": "educational level","type": "int"},{"name": "Institution","type": "string"},{"name": "Years","type": "date"}{"name": "Speciality","type": "string"}]}"""})
         self.context.append({'role':'user', 'content':f"{prompt}."})
         self.context.append({'role':'system', 'content':r"Remember your instructions as SQL Assistant."})
+        print(self.context)
         openai.api_key = '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'
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",

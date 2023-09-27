@@ -23,7 +23,8 @@ class AIQuery:
         self.context.append({'role':'user', 'content':f"{prompt}."})
         self.context.append({'role':'system', 'content':r"Remember your instructions as SQL Assistant."})
         print(self.context)
-        openai.api_key = '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'
+       # openai.api_key = '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'
+        openai.api_key = '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'
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=self.context,
@@ -36,4 +37,8 @@ class AIQuery:
             
             )
         self.context.append({'role':'assistant', 'content':f"{response}"})
-        return response
+        message = response.choices[0].message.content
+        index_inicio = message.upper().index("SELECT")
+        index_final = message.index(';')
+        sql = response.choices[0].message.content[index_inicio:index_final]
+        return sql

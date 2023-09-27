@@ -2,7 +2,8 @@ import openai
 
 class AIQuery:
     def __init__(self):
-        openai.api_key = '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'
+        #openai.api_key = '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'
+        openai.api_key = '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'
         self.context = [ {
             'role':'system', 
             'content':"""you are a bot to assist in create SQL commands, all your answers should start with \

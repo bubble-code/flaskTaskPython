@@ -12,10 +12,11 @@ ai_instalce = AIQuery()
 @app.route('/api/busqueda')
 def GetBusqueda():
     open_file = busqueda_instance.OpenFile()
-    col_names = busqueda_instance.names_col
+    col_names = busqueda_instance.names_col_cliente
     read_ids = busqueda_instance.ReadDataFromExcel(open_file=open_file,name_columns=col_names)
     result_query = busqueda_instance.HacerBusqueda(list_ids=read_ids)
     busqueda_instance.GuardarDatos(df_result=result_query)
+    #return result_query.to_json(orient='records')
     return result_query.to_json(orient='records')
 
 

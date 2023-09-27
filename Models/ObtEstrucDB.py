@@ -12,4 +12,4 @@ class ObtEstrucDB:
 
     def GetEstrucura(self):
         tables_query =[]
-        
+        string_query= "Select * from db"

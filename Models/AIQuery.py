@@ -2,7 +2,8 @@ import openai
 
 class AIQuery:
     def __init__(self):
-        openai.api_key = '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'
+        #openai.api_key = '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'
+        openai.api_key = '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'
         self.context = [ {
             'role':'system', 
             'content':"""you are a bot to assist in create SQL commands, all your answers should start with \
@@ -21,7 +22,9 @@ class AIQuery:
         self.context.append( {'role':'system', 'content':"""third table:{"tablename": "studies","fields": [{"name": "ID","type": "int"},{"name": "ID_usr","type": "int"},{"name": "educational level","type": "int"},{"name": "Institution","type": "string"},{"name": "Years","type": "date"}{"name": "Speciality","type": "string"}]}"""})
         self.context.append({'role':'user', 'content':f"{prompt}."})
         self.context.append({'role':'system', 'content':r"Remember your instructions as SQL Assistant."})
-        openai.api_key = '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'
+        print(self.context)
+       # openai.api_key = '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'
+        openai.api_key = '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'
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=self.context,
@@ -34,4 +37,8 @@ class AIQuery:
             
             )
         self.context.append({'role':'assistant', 'content':f"{response}"})
-        return response
+        message = response.choices[0].message.content
+        index_inicio = message.upper().index("SELECT")
+        index_final = message.index(';')
+        sql = response.choices[0].message.content[index_inicio:index_final]
+        return sql

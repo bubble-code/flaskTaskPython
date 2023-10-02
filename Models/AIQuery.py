@@ -1,5 +1,6 @@
 import openai
 import json
+import spacy
 
 
 class AIQuery:
@@ -18,6 +19,21 @@ class AIQuery:
                                     can be solved with SQL.
                                     """
         }]
+        self.nlp = spacy.load('es_core_news_sm')
+
+    def identificar_tablas_objetivo(self, pregunta):
+        doc = self.nlp(pregunta)
+        tablas_coincidentes = []
+        for ent in doc.ents:
+            ent_text = ent.text.lower()
+            for nombre_tabla in nombres_tablas:
+                nombre_tabla = nombre_tabla.lower()
+            if nombre_tabla in ent_text:
+                tablas_coincidentes.append(nombre_tabla)
+                if tablas_coincidentes:
+                    return tablas_coincidentes
+                else:
+                    return None
 
     def Get_context_data(self):
         try:
@@ -35,7 +51,7 @@ class AIQuery:
             table_name = content["tableName"]
             self.context.append(
                 {'role': 'system', 'content': f"{table_name}:{json.dumps(content)}"})
-        print(self.context)
+        # print(self.context)
 
     def Hacer_pregunta(self, prompt, max_tokens=100, temperature=0.5, top_p=1.0, frequency_penalty=0.0, presence_penalty=0.0, stop=["\n"]):
         # self.context.append( {'role':'system', 'content':"""first table: { "tableName": "employees", "fields": [ { "nombre": "ID_usr", "tipo": "int" }, { "nombre": "name", "tipo": "string" }]}"""})

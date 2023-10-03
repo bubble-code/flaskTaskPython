@@ -20,13 +20,24 @@ class AIQuery:
                                     """
         }]
         self.nlp = spacy.load('es_core_news_sm')
+        self.tables_from_file = None
+        self.nombres_tablas = None
+        # self.nombres_tablas = self.Get_names_tables()
+
+    def Get_names_tables(self):
+        tables_names = []
+        context = self.tables_from_file["content"]
+        for name in context:
+            tables_names.append(name["tableName"])
+        self.nombres_tablas = tables_names
 
     def identificar_tablas_objetivo(self, pregunta):
         doc = self.nlp(pregunta)
+        print(doc.ents)
         tablas_coincidentes = []
         for ent in doc.ents:
             ent_text = ent.text.lower()
-            for nombre_tabla in nombres_tablas:
+            for nombre_tabla in self.nombres_tablas:
                 nombre_tabla = nombre_tabla.lower()
             if nombre_tabla in ent_text:
                 tablas_coincidentes.append(nombre_tabla)
@@ -38,13 +49,14 @@ class AIQuery:
     def Get_context_data(self):
         try:
             with open(self.ruta_file, "r") as file:
-                return json.load(file)
+                self.tables_from_file = json.load(file)
                 # return self.estructure_db
         except Exception as e:
             print("Error al cargar", e)
             exit(1)
 
-    def add_contents(self):
+    def add_contentx(self, pregunta):
+        list_tables_coincidence = self.identificar_tablas_objetivo(pregunta)
         json_data = self.Get_context_data()
         contents = json_data["content"]
         for content in contents:
@@ -58,25 +70,27 @@ class AIQuery:
         # self.context.append( {'role':'system', 'content':"""second table:{"tableName": "salary","fields":[{"nombre": "ID_usr","type": "int"},{"name": "year","type": "date"},{"name": "salary","type": "float"}]}"""})
         # self.context.append( {'role':'system', 'content':"""third table:{"tablename": "studies","fields": [{"name": "ID","type": "int"},{"name": "ID_usr","type": "int"},{"name": "educational level","type": "int"},{"name": "Institution","type": "string"},{"name": "Years","type": "date"}{"name": "Speciality","type": "string"}]}"""})
         # self.context.append(self.Get_context_data())
-        self.context.append({'role': 'user', 'content': f"{prompt}."})
+        # self.context.append({'role': 'user', 'content': f"{prompt}."})
         # self.context.append({'role': 'system', 'content': r"Remember your instructions as SQL Assistant."})
         # print(self.context)
-        openai.api_key = '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'
+        # openai.api_key = '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'
         # openai.api_key = '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'
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=self.context,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            # top_p=top_p,
-            # frequency_penalty=frequency_penalty,
-            # presence_penalty=presence_penalty,
-            # stop=stop,
+        # response = openai.ChatCompletion.create(
+        #     model="gpt-3.5-turbo",
+        #     messages=self.context,
+        #     max_tokens=max_tokens,
+        #     temperature=temperature,
+        # top_p=top_p,
+        # frequency_penalty=frequency_penalty,
+        # presence_penalty=presence_penalty,
+        # stop=stop,
 
-        )
-        self.context.append({'role': 'assistant', 'content': f"{response}"})
-        message = response.choices[0].message.content
-        index_inicio = message.upper().index("SELECT")
-        index_final = message.index(';')
-        sql = response.choices[0].message.content[index_inicio:index_final]
-        return sql
+        # )
+        # self.context.append({'role': 'assistant', 'content': f"{response}"})
+        # message = response.choices[0].message.content
+        # index_inicio = message.upper().index("SELECT")
+        # index_final = message.index(';')
+        # sql = response.choices[0].message.content[index_inicio:index_final]
+        result = self.identificar_tablas_objetivo(pregunta=prompt)
+        return json.dumps({"result": result})
+        # return "sql"
